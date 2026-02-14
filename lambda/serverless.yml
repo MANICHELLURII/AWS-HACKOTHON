@@ -1,0 +1,164 @@
+service: nutrigen-api
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    USERS_TABLE: ${self:service}-users-${self:provider.stage}
+    FOOD_LOGS_TABLE: ${self:service}-food-logs-${self:provider.stage}
+    DAILY_AGGREGATES_TABLE: ${self:service}-daily-aggregates-${self:provider.stage}
+    FOOD_IMAGES_BUCKET: ${self:service}-food-images-${self:provider.stage}
+  httpApi:
+    cors: true
+    authorizers:
+      cognitoAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: https://cognito-idp.us-east-1.amazonaws.com/us-east-1_53VtTqX2r
+        audience:
+          - 4dvg7ea62ecce8ho3rcdamjlaf
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.USERS_TABLE}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.FOOD_LOGS_TABLE}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DAILY_AGGREGATES_TABLE}
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+          Resource: arn:aws:s3:::${self:provider.environment.FOOD_IMAGES_BUCKET}/*
+        - Effect: Allow
+          Action:
+            - rekognition:DetectLabels
+          Resource: '*'
+
+functions:
+  analyzeFood:
+    handler: src/handlers/food.analyzeImage
+    events:
+      - httpApi:
+          path: /food/analyze
+          method: post
+          authorizer:
+            name: cognitoAuthorizer
+
+  createLog:
+    handler: src/handlers/logs.createLog
+    events:
+      - httpApi:
+          path: /logs
+          method: post
+          authorizer:
+            name: cognitoAuthorizer
+
+  getDailyLog:
+    handler: src/handlers/logs.getDailyLog
+    events:
+      - httpApi:
+          path: /logs/daily/{date}
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
+
+  getProfile:
+    handler: src/handlers/users.getProfile
+    events:
+      - httpApi:
+          path: /users/me
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
+
+  updateProfile:
+    handler: src/handlers/users.updateProfile
+    events:
+      - httpApi:
+          path: /users/me
+          method: put
+          authorizer:
+            name: cognitoAuthorizer
+
+  getHealthScore:
+    handler: src/handlers/health.getHealthScore
+    events:
+      - httpApi:
+          path: /health/score
+          method: get
+          authorizer:
+            name: cognitoAuthorizer
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    FoodLogsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.FOOD_LOGS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+
+    DailyAggregatesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DAILY_AGGREGATES_TABLE}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: date
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: date
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+
+    FoodImagesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.FOOD_IMAGES_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - '*'
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+              AllowedHeaders:
+                - '*'
+
+plugins:
+  - serverless-plugin-typescript

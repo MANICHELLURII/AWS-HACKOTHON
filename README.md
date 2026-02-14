@@ -1,154 +1,90 @@
-# NUTRIGEN 🥗🤖
-AI-Powered Smart Nutrition & Health Intelligence Platform
+# NUTRIGEN - AI-Powered Nutrition Analysis
 
----
+An intelligent nutrition tracking application that uses computer vision to analyze food images and provide personalized health insights.
 
-## 📌 Overview
+## Features
 
-NUTRIGEN is an AI-driven nutrition analysis platform designed to help users understand what they eat, how it impacts their body, and whether it aligns with their health goals.
+- **Food Recognition**: Upload food images for automatic calorie and macro calculation
+- **Daily Tracking**: Log meals and monitor daily nutrition intake
+- **Health Insights**: Get personalized health scores and recommendations
+- **Goal Management**: Set and track fitness goals (weight loss, muscle gain, etc.)
+- **Analytics Dashboard**: Visualize nutrition trends and progress
 
-Using computer vision and machine learning, the system analyzes food images, estimates nutritional values, tracks intake patterns, and generates personalized health insights.
+## Tech Stack
 
-The platform focuses on preventive healthcare, intelligent nutrition tracking, and scalable cloud deployment using AWS infrastructure.
+**Frontend:**
+- React 18 with TypeScript
+- Vite for build tooling
+- AWS Amplify for authentication
+- Recharts for data visualization
 
----
+**Backend:**
+- AWS Lambda (serverless functions)
+- Amazon API Gateway (REST API)
+- Amazon DynamoDB (NoSQL database)
+- Amazon Rekognition (food detection)
+- Amazon S3 (image storage)
+- Amazon Cognito (authentication)
 
-## 🎯 Problem Statement
+## Quick Start
 
-Millions of people consume food daily without accurate knowledge of:
+### Installation
 
-- Calorie intake
-- Macronutrient balance
-- Portion size accuracy
-- Long-term health risks
-- Alignment with fitness or medical goals
+```bash
+npm install
+```
 
-Manual food logging applications are time-consuming and often inaccurate, particularly for region-specific meals.
+### Development
 
-NUTRIGEN aims to automate this process using AI.
+```bash
+npm run dev
+```
 
----
+Visit http://localhost:3000
 
-## 🚀 Key Features
+### Build
 
-- 📷 AI-based food image recognition
-- 🔍 Multi-item detection per plate
-- ⚖ Portion size estimation
-- 🔥 Automatic calorie & macronutrient calculation
-- 🎯 Goal-based nutrition tracking
-- 📊 Weekly and monthly analytics dashboard
-- ❤️ Health score & risk prediction model
-- ☁ Cloud-native serverless architecture
+```bash
+npm run build
+```
 
----
+## Project Structure
 
-## 🧠 System Architecture
+```
+nutrigen/
+├── src/
+│   ├── components/      # React components
+│   ├── services/        # API clients
+│   ├── types/          # TypeScript types
+│   └── config/         # Configuration
+├── lambda/
+│   └── src/
+│       ├── handlers/   # Lambda functions
+│       └── utils/      # Shared utilities
+└── docs/              # Documentation
+```
 
-NUTRIGEN follows a serverless, scalable AWS architecture:
+## Deployment
 
-Frontend → API Gateway → Lambda → AI Services → Database → Analytics
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
 
-### Core AWS Services:
-- AWS Amplify (Frontend Hosting)
-- Amazon Cognito (Authentication)
-- Amazon API Gateway (API Management)
-- AWS Lambda (Business Logic)
-- AWS Rekognition (Food Detection)
-- Amazon SageMaker (ML Models)
-- Amazon DynamoDB (User Data)
-- Amazon S3 (Image Storage)
-- Amazon QuickSight (Analytics)
+## Architecture
 
----
+NUTRIGEN follows a serverless, event-driven architecture:
 
-## 🏗 Tech Stack
+1. User uploads food image
+2. Image stored in S3
+3. Lambda triggers Rekognition for food detection
+4. Nutrition data calculated and stored in DynamoDB
+5. Frontend displays results and analytics
 
-### Frontend
-- React.js
-- HTML5 / CSS3 / JavaScript
-- Chart.js / Recharts
+## Contributing
 
-### Backend
-- AWS Lambda
-- REST APIs via API Gateway
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-### AI/ML
-- Convolutional Neural Networks (Food Classification)
-- Regression Models (Calorie Estimation)
-- Predictive Analytics (Health Risk Modeling)
+## License
 
-### Database & Storage
-- Amazon DynamoDB
-- Amazon S3
-
----
-
-## 📊 Functional Modules
-
-1. User Authentication & Profile Management
-2. Food Image Processing Pipeline
-3. Nutrition Calculation Engine
-4. Goal Comparison Engine
-5. Analytics & Reporting Dashboard
-6. AI Recommendation Engine
-
----
-
-## 🔐 Security & Compliance
-
-- HTTPS encrypted communication
-- Cognito-based authentication
-- IAM role-based access control
-- Secure cloud storage with restricted permissions
-- No sensitive health data exposed publicly
-
----
-
-## 📈 Scalability
-
-- Fully serverless infrastructure
-- Auto-scaling Lambda functions
-- Managed NoSQL database
-- Cloud-native ML deployment
-
-Designed to support growth from prototype to nationwide deployment.
-
----
-
-## ⚠ Assumptions & Limitations
-
-- Portion size estimation accuracy depends on image clarity.
-- Nutritional values are based on mapped datasets.
-- Initial model focuses on common food categories.
-- Not intended to replace certified medical diagnosis.
-
----
-
-## 🛣 Future Enhancements
-
-- Regional food dataset expansion
-- Wearable integration
-- Doctor/Dietician dashboard
-- AI-generated personalized diet plans
-- Multilingual voice assistant
-
----
-
-## 👥 Team
-
-Team Name: FORGERS  
-Project: NUTRIGEN  
-Domain: AI for Healthcare & Life Sciences
-
----
-
-## 📜 License
-
-This project is developed for hackathon and research purposes.
-Commercial deployment will require further regulatory and compliance review.
-
----
-
-## 💡 Vision
-
-To build an AI-powered preventive healthcare assistant that empowers individuals to make informed dietary decisions and reduce long-term lifestyle diseases through intelligent nutrition monitoring.
+MIT License - see LICENSE file for details
